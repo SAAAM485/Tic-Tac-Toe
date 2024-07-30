@@ -16,27 +16,27 @@ function Gameboard() {
     const getIsAvailable = () => isAvailable;
 
     const dropToken = (row, column, player) => {
-        if (board[row][column].getValue() === 0) {
+        let message = "";
+        if (board[row][column].getValue() === "") {
             board[row][column].addToken(player.token);
-            console.log(`Dropping ${player.name}'s token into ${row}/${column} cell...`);
+            message = `Dropping ${player.name}'s token...`;
             isAvailable = true;
         } else {
-            console.log(`This cell is already dropped a token! Please re-drop.`);
+            message = `This cell is already dropped a token! Please re-drop.`;
             isAvailable = false;
-            return;
         }
+        return message;
     }
 
     const render = () => {
         const renderCellValues = board.map((row) => row.map((cell) => cell.getValue()));
-        console.log(renderCellValues);
     }
 
     return {getBoard, dropToken, render, getIsAvailable: getIsAvailable};
 }
 
 function Cell() {
-    let value = 0;
+    let value = "";
 
     const addToken = (player) => {
         value = player;
@@ -53,11 +53,11 @@ function GameController(playerOneName = "P1", playerTwoName = "P2") {
     const players = [
         {
             name: playerOneName,
-            token: 1
+            token: "O"
         },
         {
             name: playerTwoName,
-            token: 2
+            token: "X"
         }
     ]
 
@@ -70,7 +70,6 @@ function GameController(playerOneName = "P1", playerTwoName = "P2") {
 
     const printNewRound = () => {
         board.render();
-        console.log(`It's ${getActivePlayer().name}'s turn.`);
     }
 
     const rows = 3;
@@ -82,7 +81,7 @@ function GameController(playerOneName = "P1", playerTwoName = "P2") {
             for (let j = 0; j < columns; j++) {
                 row.push(board[i][j].getValue());    
             }
-            if (row.every(element => element === 1) || row.every(element => element === 2)) {
+            if (row.every(element => element === "O") || row.every(element => element === "X")) {
                 return true;
             }
         }
@@ -95,7 +94,7 @@ function GameController(playerOneName = "P1", playerTwoName = "P2") {
             for (let i = 0; i < rows; i++) {
                 column.push(board[i][j].getValue());    
             }
-            if (column.every(element => element === 1) || column.every(element => element === 2)) {
+            if (column.every(element => element === "O") || column.every(element => element === "X")) {
                 return true;
             }
         }
@@ -111,10 +110,10 @@ function GameController(playerOneName = "P1", playerTwoName = "P2") {
         for (let i = 0; i < rows; i++) {
             diagnol2.push(board[i][rows - i - 1].getValue());
         }
-        if (diagnol1.every(element => element === 1) 
-            || diagnol1.every(element => element === 2) 
-            || diagnol2.every(element => element === 1) 
-            || diagnol2.every(element => element === 2)) {
+        if (diagnol1.every(element => element === "O") 
+            || diagnol1.every(element => element === "X") 
+            || diagnol2.every(element => element === "O") 
+            || diagnol2.every(element => element === "X")) {
             return true;
         }
         return false;
@@ -132,7 +131,7 @@ function GameController(playerOneName = "P1", playerTwoName = "P2") {
         let isDraw = true;
         board.forEach(row => {
             row.forEach(cell => {
-                if (cell.getValue() === 0) {
+                if (cell.getValue() === "") {
                     isDraw = false;
                     return isDraw;
                 }
@@ -142,18 +141,19 @@ function GameController(playerOneName = "P1", playerTwoName = "P2") {
     }
 
     const playRound = (row, column) => {
-        board.dropToken(row, column, getActivePlayer());
+        let message = "";
+        message = board.dropToken(row, column, getActivePlayer());
 
         if (board.getIsAvailable() === true) {            
             if (checkWin(board.getBoard())) {
-                console.log(`${getActivePlayer().name} wins!`);
+                message = `${getActivePlayer().name} wins!`;
             } else if (checkDraws(board.getBoard())) {
-                console.log(`It's a draw.`)   
+                message = `It's a draw.`;   
             } else {
                 switchPlayerTurn();
-                printNewRound();
             }
         }
+        return message;
     }
 
     printNewRound();
@@ -163,18 +163,17 @@ function GameController(playerOneName = "P1", playerTwoName = "P2") {
 
 function ScreenConrtroller() {
     const game = GameController();
+    const turnDiv = document.querySelector(".turn");
     const messageDiv = document.querySelector(".message");
-    const scoreDiv = document.querySelector(".score");
     const boardDiv = document.querySelector(".board");
 
     const updateScreen = () => {
         boardDiv.textContent = "";
-        scoreDiv.textContent = "";
 
         const board = game.getBoard();
         const activePlayer = game.getActivePlayer().name;
 
-        messageDiv.textContent = `${activePlayer}'s turn...`
+        turnDiv.textContent = `${activePlayer}'s turn...`
 
         board.forEach((row, rowIndex) => {
             row.forEach((cell, columnIndex) => {
@@ -196,7 +195,7 @@ function ScreenConrtroller() {
             return;
         }
 
-        game.playRound(selectedRow, selectedColumn);
+        messageDiv.textContent = game.playRound(selectedRow, selectedColumn); 
         updateScreen();
     }
 
