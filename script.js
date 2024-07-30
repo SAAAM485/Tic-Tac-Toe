@@ -148,7 +148,7 @@ function GameController(playerOneName = "P1", playerTwoName = "P2") {
             if (checkWin(board.getBoard())) {
                 console.log(`${getActivePlayer().name} wins!`);
             } else if (checkDraws(board.getBoard())) {
-                console.log(`It's a tie.`)   
+                console.log(`It's a draw.`)   
             } else {
                 switchPlayerTurn();
                 printNewRound();
@@ -158,8 +158,52 @@ function GameController(playerOneName = "P1", playerTwoName = "P2") {
 
     printNewRound();
 
-    return {getActivePlayer, playRound};
+    return {getActivePlayer, playRound, getBoard: board.getBoard};
 }
 
-const game = GameController();
+function ScreenConrtroller() {
+    const game = GameController();
+    const messageDiv = document.querySelector(".message");
+    const scoreDiv = document.querySelector(".score");
+    const boardDiv = document.querySelector(".board");
+
+    const updateScreen = () => {
+        boardDiv.textContent = "";
+        scoreDiv.textContent = "";
+
+        const board = game.getBoard();
+        const activePlayer = game.getActivePlayer().name;
+
+        messageDiv.textContent = `${activePlayer}'s turn...`
+
+        board.forEach((row, rowIndex) => {
+            row.forEach((cell, columnIndex) => {
+                const cellButton = document.createElement("button");
+                cellButton.classList.add("cell");
+                cellButton.dataset.row = rowIndex;
+                cellButton.dataset.column = columnIndex;
+                cellButton.textContent = cell.getValue();
+                boardDiv.appendChild(cellButton);
+            })
+        })
+    }
+
+    function boardClickHandler(e) {
+        const selectedRow = e.target.dataset.row;
+        const selectedColumn = e.target.dataset.column;
+
+        if (!selectedRow || !selectedColumn) {
+            return;
+        }
+
+        game.playRound(selectedRow, selectedColumn);
+        updateScreen();
+    }
+
+    boardDiv.addEventListener("click", boardClickHandler);
+
+    updateScreen();
+}
+
+ScreenConrtroller();
 
