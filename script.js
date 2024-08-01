@@ -19,7 +19,7 @@ function Gameboard() {
         let message = "";
         if (board[row][column].getValue() === "") {
             board[row][column].addToken(player.token);
-            message = `Dropping ${player.name}'s token...`;
+            message = `Dropped ${player.name}'s token ${player.token}...`;
             isAvailable = true;
         } else {
             message = `This cell is already dropped a token! Please re-drop.`;
@@ -28,11 +28,7 @@ function Gameboard() {
         return message;
     }
 
-    const render = () => {
-        const renderCellValues = board.map((row) => row.map((cell) => cell.getValue()));
-    }
-
-    return {getBoard, dropToken, render, getIsAvailable: getIsAvailable};
+    return {getBoard, dropToken, getIsAvailable: getIsAvailable};
 }
 
 function Cell() {
@@ -47,7 +43,7 @@ function Cell() {
     return {addToken, getValue}
 }
 
-function GameController(playerOneName = "P1", playerTwoName = "P2") {
+function GameController(playerOneName, playerTwoName) {
     const board = Gameboard();
 
     const players = [
@@ -68,9 +64,7 @@ function GameController(playerOneName = "P1", playerTwoName = "P2") {
         activePlayer = activePlayer === players[0] ? players[1] : players[0];
     }
 
-    const printNewRound = () => {
-        board.render();
-    }
+
 
     const rows = 3;
     const columns = 3;
@@ -156,24 +150,58 @@ function GameController(playerOneName = "P1", playerTwoName = "P2") {
         return message;
     }
 
-    printNewRound();
-
     return {getActivePlayer, playRound, getBoard: board.getBoard};
 }
 
 function ScreenConrtroller() {
-    const game = GameController();
+    const dialog = document.querySelector("dialog");
+    const startButton = document.querySelector("#start");
+    const restartButton = document.querySelector("#restart");
+    const cancelBtn = document.querySelector("#cancel_btn");
+    const playBtn = document.querySelector("#play_btn");
     const turnDiv = document.querySelector(".turn");
     const messageDiv = document.querySelector(".message");
     const boardDiv = document.querySelector(".board");
+    let player1Name = document.querySelector("#player1").value;
+    let player2Name = document.querySelector("#player2").value;
+    let game = GameController("Player 1", "Player 2");
+    startButton.addEventListener("click", () => dialog.showModal());
+    cancelBtn.addEventListener("click", () => dialog.close());
+
+    function playClickHandler(event) {
+        event.preventDefault();
+        messageDiv.innerHTML = "&nbsp";
+        player1Name = document.querySelector("#player1").value;
+        player2Name = document.querySelector("#player2").value;
+        if (player1Name === "" || player2Name === "") {
+            alert("Fields must be filled out");
+            return;
+        }
+        dialog.close();
+        game = GameController(player1Name, player2Name);
+        updateScreen();
+        return;
+    }
+
+    playBtn.addEventListener("click", playClickHandler);
+
+    function restartClickHandler() {
+        messageDiv.innerHTML = "&nbsp";
+        game = GameController(player1Name, player2Name);
+        updateScreen();
+    }
+
+    restartButton.addEventListener("click", restartClickHandler)
 
     const updateScreen = () => {
         boardDiv.textContent = "";
 
         const board = game.getBoard();
-        const activePlayer = game.getActivePlayer().name;
-
-        turnDiv.textContent = `${activePlayer}'s turn...`
+        const activePlayer = game.getActivePlayer();
+        if (activePlayer.name !== "") {
+            turnDiv.textContent = `${activePlayer.token} It's ${activePlayer.name}'s turn...`
+        }
+        
 
         board.forEach((row, rowIndex) => {
             row.forEach((cell, columnIndex) => {
@@ -201,6 +229,7 @@ function ScreenConrtroller() {
 
     boardDiv.addEventListener("click", boardClickHandler);
 
+    dialog.showModal();
     updateScreen();
 }
 

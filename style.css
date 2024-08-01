@@ -56,3 +56,82 @@ header {
     border-radius: 0.4rem;
     color: #6482AD;
 }
+
+.start_buttons button:hover {
+    background-color: #6482AD;
+    color: #E2DAD6;
+    border: 0.1rem solid #E2DAD6;
+}
+
+.start_buttons button:active {
+    background-color: #E2DAD6;
+    border: 0.1rem solid #6482AD;
+    color: #6482AD;
+    transform: translateY(0.02rem);
+}
+
+dialog {
+    border: #6482AD;
+    border-radius: 0.4rem;
+    background-color:  #F5EDED;
+    color: #6482AD;
+    font-size: 1.2rem;
+    padding: 2rem 5rem;
+}
+
+dialog form {
+    display: flex;
+    flex-direction: column;
+    margin-top: 2rem;
+}
+
+dialog label {
+    margin-bottom: 0.2rem;
+    font-weight: 450;
+}
+
+dialog .btns {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+dialog form input[type=text] {
+    appearance: none;
+    outline: none;
+    padding: 0 1.2rem;
+    font-family: inherit;
+    font-size: 1.1rem;
+    letter-spacing: 0.02rem;
+    height: 2rem;
+    margin-bottom: 1.5rem;
+    border: #6482AD 0.1rem solid;
+    background-color: #E2DAD6;
+    color: #6482AD;
+    border-radius: 0.4rem;
+}
+
+dialog form button {
+    border: none;
+    border-radius: 0.4rem;
+    background-color: #6482AD;
+    color: #F5EDED;
+    font-size: 1.3rem;
+    height: 2.5rem;
+    width: 10rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 0.1rem #999;
+}
+
+dialog form button:hover {
+    background-color: #6474ad;
+}
+
+dialog form button:active {
+    background-color: #6482AD;
+    transform: translateY(0.1rem);
+}
+
+dialog::backdrop {
+    backdrop-filter: blur(2px);
+}
